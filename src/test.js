@@ -1,11 +1,11 @@
 import axios from "axios"
-import { chromium } from 'playwright'
+
+import {getBrowser} from './utils.js'
 
 
 async function test() {
-    const browser = await chromium.launch({headless:false});
-    const context = await browser.newContext();
-    const page = await context.newPage();
+    const browser = await getBrowser()
+    const page = await browser.newPage();
     
       try{
         const res=await  axios.get("http://localhost:4000/public/hello.js")

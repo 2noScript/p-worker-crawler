@@ -3,3 +3,6 @@ export const PROXY = {
     username: "zrkjzogb-rotate",
     password: "ll9xh2qep7s4",
 }
+
+
+export const MAX_NTR=50

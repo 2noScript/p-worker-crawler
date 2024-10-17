@@ -1,0 +1,10 @@
+{
+   "info":{
+     "name":"Nettuyen",
+     "lang":["vi"],
+     "country":"VN",
+     "src":"nettruyenww.com"
+   },
+   "tasks":["hot","topDay","topWeek","topMonth"],
+   "baseUrl":"http://localhost:4000/public/nettruyen"
+}
