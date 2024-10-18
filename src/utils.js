@@ -1,16 +1,10 @@
 import axios from 'axios'
 import { chromium } from 'playwright'
-
-const store={
-    browser:null,
-    working:{},
-    pageCount:0
+globalThis.store = {
+    browser: null,
+    working: {},
+    pageCount: 0,
 }
-
-
-
-
-
 
 export function sleep(seconds) {
     return new Promise(resolve => setTimeout(resolve, seconds * 1000))
@@ -37,24 +31,23 @@ export async function getRawHandle(url) {
         const res = await axios.get(url)
         return res.data
     } catch (err) {
-        console.error(err)
+        console.error('url', err)
         return ''
     }
 }
 
-
 export async function generateTask(configUrl) {
     try {
         const res = await axios.get(configUrl)
-        const {info,tasks,baseUrl} =res.data
-        const handlers={}
-        
-        for (const task of tasks){
-            handlers[task] =await getRawHandle(`${baseUrl}/${task}.js`)
+        const { info, tasks, baseUrl } = res.data
+        const handlers = {}
+
+        for (const task of tasks) {
+            handlers[task] = await getRawHandle(`${baseUrl}/${task}.js`)
         }
         return {
             info,
-            handlers
+            handlers,
         }
     } catch (err) {
         console.error(err)
@@ -63,17 +56,14 @@ export async function generateTask(configUrl) {
 }
 
 
-async function worker(task) {
-   const _browser=await getBrowser()
-   const page =await _browser.newPage()
-   store.pageCount+=1
 
-   const result=  eval(task) 
-   await page.close()
+export async function worker(handlerCode) {
+    const _browser = await getBrowser()
+    const page = await _browser.newPage()
+    store.pageCount += 1
 
-   store.pageCount-=1
-   return result
+    const result = await eval(handlerCode + 'handler()')
+    await page.close()
+    store.pageCount -= 1
+    return result
 }
-
-
-

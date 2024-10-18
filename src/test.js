@@ -1,19 +1,16 @@
-import axios from "axios"
-
-import {getBrowser} from './utils.js'
 
 
-async function test() {
-    const browser = await getBrowser()
-    const page = await browser.newPage();
-    
-      try{
-        const res=await  axios.get("http://localhost:4000/public/hello.js")
-        await eval(res.data)
-      }
-      catch (err){
-        console.error(err)
-      }
-}
+let a="dsdsdsdsds"
 
-test()
+let code = `
+globalThis.greet = function(name) {
+    return a
+}`;
+
+
+
+// Sử dụng eval để tạo hàm trong phạm vi toàn cục
+eval(code);
+
+// Gọi hàm greet sau khi eval đã thực thi
+console.log(greet("Alice")); // Output: Hello, Alice

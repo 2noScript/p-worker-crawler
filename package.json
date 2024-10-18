@@ -7,7 +7,7 @@
         "dev": "nodemon src",
         "w": "nodemon src/worker.js",
         "test": "nodemon src/test.js",
-        "sv": "node src/test/sv.js"
+        "sv": "node test"
     },
     "license": "MIT",
     "dependencies": {

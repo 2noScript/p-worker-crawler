@@ -1,5 +1,12 @@
-import { getBrowser ,generateTask} from './utils.js'
+import { getBrowser ,generateTask ,worker} from './utils.js'
 
 
 
-generateTask("http://localhost:4000/public/nettruyen/config.json").then(data=>console.log(data))
+async function bootApp(){
+  const {info,handlers}=await generateTask("http://localhost:4000/nettruyen/config.json")
+  for (const handleName in handlers){
+    const result=await worker(handlers[handleName])
+  }
+}
+
+bootApp()
