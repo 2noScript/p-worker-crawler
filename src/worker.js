@@ -1,45 +1,44 @@
+import { FingerprintGenerator } from 'fingerprint-generator'
+import { FingerprintInjector } from 'fingerprint-injector'
 import { chromium } from 'playwright'
 import { log } from 'console'
-import { PROXY } from './constant.js'
+import { PROCESS_CMD } from './constant.js'
+import { runCommand ,sleep} from './utils.js'
 
+class Worker {
+    static #browser = null
+    #context
+    constructor() {}
 
-
-
-
-(async () => {
-    const browser = await chromium.launch({headless:false});
-    const context = await browser.newContext();
-    const page = await context.newPage();
-  
- 
-      const webRtcCode = `
-      const peerConnection = new RTCPeerConnection({
-        iceServers: [
-          { urls: 'stun:stun.l.google.com:19302' }  // STUN server của Google
-        ]
-      });
-  
-      // Tạo và hiển thị một offer
-      peerConnection.createOffer()
-        .then(offer => peerConnection.setLocalDescription(offer))
-        .then(() => {
-          console.log('Offer created and set as local description');
-        })
-        .catch(error => {
-          console.error('Error creating offer:', error);
-        });
-  
-      // Log ICE candidate
-      peerConnection.onicecandidate = event => {
-        if (event.candidate) {
-          console.log('ICE Candidate:', event.candidate);
+    async #build() {
+        const fingerprintGenerator = new FingerprintGenerator()
+        const fingerprintInjector = new FingerprintInjector()
+        const browserFingerprintWithHeaders =
+            fingerprintGenerator.getFingerprint({
+                devices: config?.devices || ['desktop'],
+                browsers: ['chrome', 'firefox'],
+            })
+        const { fingerprint } = browserFingerprintWithHeaders
+        const options = {
+            headless: true,
         }
-      };
-    `;
-    await page.evaluate(webRtcCode);
-    await page.goto('https://browserleaks.com/webrtc');
-     
-  
-  })();
+        await this.#context?.close()
+        if (!Worker.#browser) Worker.#browser = await chromium.launch(options)
 
-
+        this.#context = await browser.newContext({
+            // locale: '',
+            viewport: fingerprint.screen,
+        })
+        await fingerprintInjector.attachFingerprintToPlaywright(
+            context,
+            browserFingerprintWithHeaders
+        )
+        return this.#context
+    }
+    static async browserOff() {
+        await Worker.#browser?.close()
+        await runCommand(PROCESS_CMD.KILL_BROWSER)
+        await sleep(5)
+        console.log('clean browser')
+    }
+}

@@ -1,5 +1,7 @@
 import axios from 'axios'
 import { chromium } from 'playwright'
+import cmd from 'node-cmd'
+
 globalThis.store = {
     browser: null,
     working: {},
@@ -66,4 +68,16 @@ export async function worker(handlerCode) {
     await page.close()
     store.pageCount -= 1
     return result
+}
+
+
+export function runCommand(command) {
+    return new Promise((resolve, reject) => {
+        const result = cmd.runSync(command)
+        if (result.err) {
+            reject(result.err)
+        } else {
+            resolve(result)
+        }
+    })
 }

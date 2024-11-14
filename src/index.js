@@ -1,12 +1,11 @@
-import { getBrowser ,generateTask ,worker} from './utils.js'
+import express from 'express'
+import { PORT } from './constant.js';
+
+const app = express();
 
 
 
-async function bootApp(){
-  const {info,handlers}=await generateTask("http://localhost:4000/nettruyen/config.json")
-  for (const handleName in handlers){
-    const result=await worker(handlers[handleName])
-  }
-}
 
-bootApp()
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});
