@@ -1,32 +1,6 @@
 import axios from 'axios'
-import { chromium } from 'playwright'
 import cmd from 'node-cmd'
 
-globalThis.store = {
-    browser: null,
-    working: {},
-    pageCount: 0,
-}
-
-export function sleep(seconds) {
-    return new Promise(resolve => setTimeout(resolve, seconds * 1000))
-}
-
-export async function getBrowser(params = {}) {
-    if (!store.browser) {
-        store.browser = await chromium.launch({
-            headless: false,
-            args: [
-                '--disable-webrtc',
-                '--disable-rtc-smoothness-algorithm',
-                '--disable-rtc-probe',
-                '--disable-rtc-smoothness',
-            ],
-            ...params,
-        })
-    }
-    return store.browser
-}
 
 export async function getRawHandle(url) {
     try {
@@ -59,16 +33,16 @@ export async function generateTask(configUrl) {
 
 
 
-export async function worker(handlerCode) {
-    const _browser = await getBrowser()
-    const page = await _browser.newPage()
-    store.pageCount += 1
+// export async function worker(handlerCode) {
+//     const _browser = await getBrowser()
+//     const page = await _browser.newPage()
+//     store.pageCount += 1
 
-    const result = await eval(handlerCode + 'handler()')
-    await page.close()
-    store.pageCount -= 1
-    return result
-}
+//     const result = await eval(handlerCode + 'handler()')
+//     await page.close()
+//     store.pageCount -= 1
+//     return result
+// }
 
 
 export function runCommand(command) {

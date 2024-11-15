@@ -1,11 +1,5 @@
-import express from 'express'
-import { PORT } from './constant.js';
-
-const app = express();
+import { Worker } from './worker.js'
 
 
+const worker=new Worker()
 
-
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});

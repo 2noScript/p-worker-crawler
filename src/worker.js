@@ -3,7 +3,7 @@ import { FingerprintInjector } from 'fingerprint-injector'
 import { chromium } from 'playwright'
 import { log } from 'console'
 import { PROCESS_CMD } from './constant.js'
-import { runCommand ,sleep} from './utils.js'
+import { runCommand, sleep } from './utils.js'
 
 class Worker {
     static #browser = null
@@ -35,10 +35,26 @@ class Worker {
         )
         return this.#context
     }
+
+    #sleep(seconds) {
+        return new Promise(resolve => setTimeout(resolve, seconds * 1000))
+    }
     static async browserOff() {
         await Worker.#browser?.close()
         await runCommand(PROCESS_CMD.KILL_BROWSER)
         await sleep(5)
         console.log('clean browser')
     }
+    async exec(callBack){
+      const page =await this.#context.newPage()
+      const params={
+        page:page,
+        sleep:this.#sleep
+      }
+      const result=await callBack(params)
+      await page.close()
+      return result
+    }
 }
+
+export default Worker
