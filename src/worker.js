@@ -1,39 +1,37 @@
 import { FingerprintGenerator } from 'fingerprint-generator'
 import { FingerprintInjector } from 'fingerprint-injector'
 import { chromium } from 'playwright'
-import { log } from 'console'
 import { PROCESS_CMD } from './constant.js'
-import { runCommand, sleep } from './utils.js'
+import { runCommand } from './utils.js'
 
 class Worker {
     static #browser = null
     #context
     constructor() {}
 
-    async #build() {
+    async #build(config) {
         const fingerprintGenerator = new FingerprintGenerator()
         const fingerprintInjector = new FingerprintInjector()
         const browserFingerprintWithHeaders =
             fingerprintGenerator.getFingerprint({
-                devices: config?.devices || ['desktop'],
+                devices:  ['desktop','mobile'],
                 browsers: ['chrome', 'firefox'],
             })
         const { fingerprint } = browserFingerprintWithHeaders
         const options = {
-            headless: true,
+            headless: false,
         }
         await this.#context?.close()
         if (!Worker.#browser) Worker.#browser = await chromium.launch(options)
 
-        this.#context = await browser.newContext({
-            // locale: '',
+        this.#context = await Worker.#browser.newContext({
+            ...(config?.proxy ? { proxy: config.proxy } : {}),
             viewport: fingerprint.screen,
         })
         await fingerprintInjector.attachFingerprintToPlaywright(
-            context,
+            this.#context,
             browserFingerprintWithHeaders
         )
-        return this.#context
     }
 
     #sleep(seconds) {
@@ -41,17 +39,17 @@ class Worker {
     }
     static async browserOff() {
         await Worker.#browser?.close()
+        Worker.#browser=null
         await runCommand(PROCESS_CMD.KILL_BROWSER)
-        await sleep(5)
         console.log('clean browser')
     }
-    async exec(callBack){
+    async run(handlerCode){
+      if (!this.#context) await this.#build()
+      //resources
       const page =await this.#context.newPage()
-      const params={
-        page:page,
-        sleep:this.#sleep
-      }
-      const result=await callBack(params)
+      const sleep=this.#sleep
+    
+      const result=await  eval(handlerCode + 'handler()')
       await page.close()
       return result
     }
