@@ -1,4 +1,3 @@
-import axios from 'axios'
 import cmd from 'node-cmd'
 
 export function runCommand(command) {

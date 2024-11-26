@@ -1,7 +1,7 @@
 import { FingerprintGenerator } from 'fingerprint-generator'
 import { FingerprintInjector } from 'fingerprint-injector'
-import { chromium } from 'playwright'
-import { PROCESS_CMD } from './constant.js'
+import { chromium ,firefox,webkit} from 'playwright'
+import { PROCESS_CMD ,DEVICES,BROWSERS,WORKER_CONFIG} from './constant.js'
 import { runCommand } from './utils.js'
 
 class Worker {
@@ -9,20 +9,33 @@ class Worker {
     #context
     constructor() {}
 
+    async #getInstance(instanceType){
+        const options = {
+            headless: false,
+        }
+        switch(instanceType){
+            case WORKER_CONFIG.INSTANCE.CHROMIUM:
+                return chromium.launch(options)
+            case WORKER_CONFIG.INSTANCE.FIREFOX:
+                return firefox.launch(options)
+            case WORKER_CONFIG.INSTANCE.WEBKIT:
+                return webkit.launch(options)
+            default :
+                return chromium.launch(options)
+        }
+    }
+    
     async #build(config) {
         const fingerprintGenerator = new FingerprintGenerator()
         const fingerprintInjector = new FingerprintInjector()
         const browserFingerprintWithHeaders =
             fingerprintGenerator.getFingerprint({
-                devices:  ['desktop','mobile'],
-                browsers: ['chrome', 'firefox'],
+                devices:  DEVICES,
+                browsers: BROWSERS,
             })
         const { fingerprint } = browserFingerprintWithHeaders
-        const options = {
-            headless: false,
-        }
-        await this.#context?.close()
-        if (!Worker.#browser) Worker.#browser = await chromium.launch(options)
+
+        if (!Worker.#browser) Worker.#browser = await this.#getInstance(config?.instance)
 
         this.#context = await Worker.#browser.newContext({
             ...(config?.proxy ? { proxy: config.proxy } : {}),
