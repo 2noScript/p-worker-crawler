@@ -19,12 +19,12 @@ services:
   #     - playwright-chrome
 
   browserless:
-    image: browserless/chrome
+    image: ghcr.io/browserless/chromium
     container_name: browserless
     hostname: browserless
     restart: unless-stopped
     # environment:
-    #   - TOKEN=YOUR_PLAYWRIGHT_TOKEN
+    #   - TOKEN=1234
     #   - SCREEN_WIDTH=1920
     #   - SCREEN_HEIGHT=1024
     #   - SCREEN_DEPTH=16
