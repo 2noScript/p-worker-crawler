@@ -1,22 +1,6 @@
 # version: '3.9'
 
 services:
-  # changedetection:
-  #   image: ghcr.io/dgtlmoon/changedetection.io:latest
-  #   container_name: changedetection
-  #   hostname: changedetection
-  #   volumes:
-  #     - /home/path/files:/datastore  
-  #   environment:
-  #     - PORT=20400  
-  #     - PUID=0  
-  #     - PGID=0 
-  #     - PLAYWRIGHT_DRIVER_URL=ws://playwright-chrome:3000/chrome?token=YOUR_PLAYWRIGHT_TOKEN&launch={"headless":false}
-  #   ports:
-  #     - 20400:20400 
-  #   restart: unless-stopped
-  #   depends_on:
-  #     - playwright-chrome
 
   browserless:
     image: ghcr.io/browserless/chromium

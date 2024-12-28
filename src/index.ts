@@ -16,7 +16,7 @@ function sleep(ms:any) {
   
   await page.goto('https://fastscans5.net/',{waitUntil:'networkidle'});
   
-  // await sleep(12000)
+  await sleep(12000)
   const title = await page.title();
   
 
